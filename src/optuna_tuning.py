@@ -10,7 +10,7 @@ from model import LSTMRegressor
 # =========================
 # OBJECTIVE FUNCTION
 # =========================
-def objective(trial, train_loader, test_loader):
+def objective(trial, train_dataset, test_dataset):
 
     # 🔷 SEARCH SPACE
     hidden_size = trial.suggest_categorical("hidden_size", [8, 16, 32, 64])
@@ -40,7 +40,7 @@ def objective(trial, train_loader, test_loader):
     for _ in range(EPOCHS):
         model.train()
 
-        for X_batch, y_batch in train_loader:
+        for X_batch, y_batch in train_dataset:
             outputs = model(X_batch).squeeze()
             loss = criterion(outputs, y_batch)
 
@@ -53,12 +53,12 @@ def objective(trial, train_loader, test_loader):
     total_loss = 0
 
     with torch.no_grad():
-        for X_batch, y_batch in test_loader:
+        for X_batch, y_batch in test_dataset:
             outputs = model(X_batch).squeeze()
             loss = criterion(outputs, y_batch)
             total_loss += loss.item()
 
-    avg_loss = total_loss / len(test_loader)
+    avg_loss = total_loss / len(test_dataset)
 
     return avg_loss
 
@@ -66,12 +66,12 @@ def objective(trial, train_loader, test_loader):
 # =========================
 # RUN OPTUNA
 # =========================
-def run_optimization(train_loader, test_loader, n_trials=20):
+def run_optimization(train_dataset, test_dataset, n_trials=20):
 
     study = optuna.create_study(direction="minimize")
 
     study.optimize(
-        lambda trial: objective(trial, train_loader, test_loader),
+        lambda trial: objective(trial, train_dataset, test_dataset),
         n_trials=n_trials
     )
 
