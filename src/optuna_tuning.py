@@ -4,7 +4,7 @@
 import optuna
 import torch.nn as nn
 import torch.optim as optim
-from model import LSTMRegressor
+from src.model import LSTMRegressor
 
 
 # =========================
